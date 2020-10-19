@@ -1,10 +1,23 @@
-// TODO: This will be have a lot of posts
-// TODO: Don't forget the header
-
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
+import { Post } from "./components/post/Post";
 
 function App() {
+	const [posts, setPosts] = useState([
+		{
+			username: "Ahmad Irfan",
+			caption: "It is ReactJS time!",
+			imageUrl:
+				"https://cdn-media-1.freecodecamp.org/images/1*qUlxDdY3T-rDtJ4LhLGkEg.png",
+		},
+		{
+			username: "Jone Doe",
+			caption: "React!",
+			imageUrl:
+				"https://cdn-media-1.freecodecamp.org/images/1*qUlxDdY3T-rDtJ4LhLGkEg.png",
+		},
+	]);
+
 	return (
 		<div className="app">
 			<div className="app__header">
@@ -15,6 +28,13 @@ function App() {
 				/>
 			</div>
 			<h1>Instagram Clone</h1>
+			{posts.map((post) => (
+				<Post
+					username={post.username}
+					caption={post.caption}
+					imageUrl={post.imageUrl}
+				/>
+			))}
 		</div>
 	);
 }
