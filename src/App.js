@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal from "@material-ui/core/Modal";
+import InstagramEmbed from "react-instagram-embed";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, Input } from "@material-ui/core";
 
@@ -7,6 +8,7 @@ import "./App.css";
 
 import { Post } from "./components/post/Post";
 import { db, auth } from "./firebase";
+import { ImageUpload } from "./components/image_upload/ImageUpload";
 
 function getModalStyle() {
 	const top = 50;
@@ -45,9 +47,13 @@ function App() {
 
 	// to display all the posts on photos to the app
 	useEffect(() => {
-		db.collection("posts").onSnapshot((snapshot) => {
-			setPosts(snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() })));
-		});
+		db.collection("posts")
+			.orderBy("timestamp", "desc")
+			.onSnapshot((snapshot) => {
+				setPosts(
+					snapshot.docs.map((doc) => ({ id: doc.id, post: doc.data() }))
+				);
+			});
 	}, []);
 
 	// for authentication
@@ -55,7 +61,6 @@ function App() {
 		const unsubscribe = auth.onAuthStateChanged((authUser) => {
 			if (authUser) {
 				// if user logged in
-				console.log(authUser);
 				setUser(authUser);
 			} else {
 				// if user logged out
@@ -169,24 +174,44 @@ function App() {
 					className="app__headerImage"
 					alt=""
 				/>
+				{user ? (
+					<Button onClick={() => auth.signOut()}>Logout</Button>
+				) : (
+					<div className="app__loginContainer">
+						<Button onClick={() => setOpen(true)}>Sign Up</Button>
+						<Button onClick={() => setOpenSignIn(true)}>Sign In</Button>
+					</div>
+				)}
 			</div>
-			{user ? (
-				<Button onClick={() => auth.signOut()}>Logout</Button>
-			) : (
-				<div className="app__loginContainer">
-					<Button onClick={() => setOpen(true)}>Sign Up</Button>
-					<Button onClick={() => setOpenSignIn(true)}>Sign In</Button>
+			<div className="app__posts">
+				<div className="app__postLeft">
+					{posts.map(({ id, post }) => (
+						<Post
+							key={id}
+							postId={id}
+							user={user}
+							username={post.username}
+							caption={post.caption}
+							imageUrl={post.imageUrl}
+						/>
+					))}
 				</div>
-			)}
-			<h1>Instagram Clone</h1>
-			{posts.map(({ id, post }) => (
-				<Post
-					key={id}
-					username={post.username}
-					caption={post.caption}
-					imageUrl={post.imageUrl}
-				/>
-			))}
+				<div className="app__postRight">
+					<InstagramEmbed
+						url="https://instagr.am/p/Zw9o4/"
+						maxWidth={320}
+						hideCaption={false}
+						containerTagName="div"
+						protocol=""
+						injectScript
+						onLoading={() => {}}
+						onSuccess={() => {}}
+						onAfterRender={() => {}}
+						onFailure={() => {}}
+					/>
+				</div>
+			</div>
+			{user?.displayName ? <ImageUpload username={user.displayName} /> : ""}
 		</div>
 	);
 }
