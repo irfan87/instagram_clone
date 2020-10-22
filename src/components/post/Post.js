@@ -63,7 +63,7 @@ export const Post = ({ username, user, postId, caption, imageUrl }) => {
 					</p>
 				))}
 			</div>
-			{user ? (
+			{user && (
 				<form className="post__commentBox">
 					<input
 						type="text"
@@ -81,8 +81,6 @@ export const Post = ({ username, user, postId, caption, imageUrl }) => {
 						Post
 					</button>
 				</form>
-			) : (
-				""
 			)}
 		</div>
 	);
